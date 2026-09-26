@@ -1,4 +1,5 @@
 document.getElementById('btn-calcular').addEventListener('click', procesarSimulacion);
+document.getElementById('btn-limpiar').addEventListener('click', limpiarCampos);
 
 function procesarSimulacion() {
   const montoInput = parseFloat(document.getElementById('monto').value);
@@ -68,3 +69,16 @@ function mostrarResultado(primerPago, totalIntereses, totalIVA, totalPagos) {
     </div>
   `;
 }
+
+function limpiarCampos() {
+  document.getElementById('nombre').value = '';
+  document.getElementById('edad').value = '';
+  document.getElementById('ingreso').value = '';
+  document.getElementById('monto').value = '';
+  document.getElementById('tasa').value = '';
+  document.getElementById('plazo').selectedIndex = 0;
+
+  document.getElementById('resultado').innerHTML = '';
+  document.querySelector('#tabla-amortizacion tbody').innerHTML = '';
+}
+
