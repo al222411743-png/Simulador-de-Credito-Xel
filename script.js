@@ -27,12 +27,49 @@ function procesarSimulacion() {
     saldoInsoluto -= amortizacionCapital;
   }
 
-  agregarHistorial(nombre, montoInput, plazoMeses, acumuladoPagos.toFixed(2));
+  // Evaluar condiciones de aprobación
+  const pagoMensualPromedio = acumuladoPagos / plazoMeses;
+  const porcentajeIngreso = (pagoMensualPromedio / ingreso) * 100;
+  let califica;
+
+  if (edad < 18 || edad > 65) {
+    califica = "❌ No califica (edad fuera de rango)";
+  } else if (porcentajeIngreso > 40) {
+    califica = "❌ No califica (pago mensual supera 40% del ingreso)";
+  } else {
+    califica = "✅ Sí califica";
+  }
+
+  mostrarResultado(acumuladoPagos.toFixed(2), pagoMensualPromedio.toFixed(2), califica);
+  agregarHistorial(nombre, montoInput, plazoMeses, acumuladoPagos.toFixed(2), califica);
+  guardarHistorialLocal(nombre, montoInput, plazoMeses, acumuladoPagos.toFixed(2), califica);
 }
 
-function agregarHistorial(nombre, monto, plazo, total) {
+function mostrarResultado(total, mensual, califica) {
+  const resultadoDiv = document.getElementById('resultado');
+  resultadoDiv.innerHTML = `
+    Total a pagar durante el crédito: <strong>$${total}</strong><br>
+    Pago mensual promedio: <strong>$${mensual}</strong><br>
+    Estado del crédito: <strong>${califica}</strong>
+  `;
+}
+
+function agregarHistorial(nombre, monto, plazo, total, califica) {
   const tabla = document.querySelector('#historial tbody');
   const fila = document.createElement('tr');
-  fila.innerHTML = `<td>${nombre}</td><td>$${monto}</td><td>${plazo} meses</td><td>$${total}</td>`;
+  fila.innerHTML = `<td>${nombre}</td><td>$${monto}</td><td>${plazo} meses</td><td>$${total}</td><td>${califica}</td>`;
   tabla.appendChild(fila);
 }
+
+function guardarHistorialLocal(nombre, monto, plazo, total, califica) {
+  const simulaciones = JSON.parse(localStorage.getItem('historialSimulaciones')) || [];
+  simulaciones.push({ nombre, monto, plazo, total, califica });
+  localStorage.setItem('historialSimulaciones', JSON.stringify(simulaciones));
+}
+
+function cargarHistorialLocal() {
+  const simulaciones = JSON.parse(localStorage.getItem('historialSimulaciones')) || [];
+  simulaciones.forEach(sim => agregarHistorial(sim.nombre, sim.monto, sim.plazo, sim.total, sim.califica));
+}
+
+window.onload = cargarHistorialLocal;
